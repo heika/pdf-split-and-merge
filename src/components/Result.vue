@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="uploaded-files" v-if="pages.length > 0">
     <button v-if="pages.length > 0" v-on:click="merge">Merge</button>
     <ul>
       <li v-for="(page, index) in pages">

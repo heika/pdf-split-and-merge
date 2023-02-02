@@ -37,4 +37,8 @@ body {
   font-family: Verdana, Tahoma;
   position: relative;
 }
+
+div:has(> #uploaded-files) .upload-container {
+  height: 100px;
+}
 </style>
