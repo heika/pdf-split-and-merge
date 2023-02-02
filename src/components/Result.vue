@@ -4,12 +4,11 @@
     <ul>
       <li v-for="(page, index) in pages">
         <input type="checkbox" v-model="page.selected" />
-        <iframe :src="page.content" />
-        <!--iframe
+        <iframe
           :src="page.content"
-          :height="page.size.height"
-          :width="page.size.width"
-        /-->
+          :height="page.size.height/2"
+          :width="page.size.width/2"
+        >
         <button v-on:click="deletePage(index)">Delete</button>
       </li>
     </ul>
@@ -70,7 +69,7 @@ export default {
         const docUrl = URL.createObjectURL(tempblob);
         docUrls.push({
           selected: true,
-          content: `${docUrl}#toolbar=0&navpanes=0&scrollbar=0&zoom=FitW`,
+          content: `${docUrl}#toolbar=0&navpanes=0&scrollbar=0`,
           size: newPdfDoc[i].size,
         });
       }
