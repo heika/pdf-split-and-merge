@@ -5,6 +5,11 @@
       <li v-for="(page, index) in pages">
         <input type="checkbox" v-model="page.selected" />
         <iframe :src="page.content" />
+        <!--iframe
+          :src="page.content"
+          :height="page.size.height"
+          :width="page.size.width"
+        /-->
         <button v-on:click="deletePage(index)">Delete</button>
       </li>
     </ul>
@@ -41,10 +46,15 @@ export default {
       for (let i = 0; i < noOfPage; i++) {
         const pdfNewDoc = await PDFDocument.create();
         const docPages = await pdfNewDoc.copyPages(pdfSrcDoc, [i]);
-        docPages.forEach((page) => pdfNewDoc.addPage(page));
+        let size = {};
+        docPages.forEach(function (page) {
+          pdfNewDoc.addPage(page);
+          size = page.getSize();
+        });
         const newpdf = await pdfNewDoc.save();
         pdfPages.push({
           pdf: newpdf,
+          size: size,
         });
       }
 
@@ -60,7 +70,8 @@ export default {
         const docUrl = URL.createObjectURL(tempblob);
         docUrls.push({
           selected: true,
-          content: `${docUrl}`,
+          content: `${docUrl}#toolbar=0&navpanes=0&scrollbar=0&zoom=FitW`,
+          size: newPdfDoc[i].size,
         });
       }
 
