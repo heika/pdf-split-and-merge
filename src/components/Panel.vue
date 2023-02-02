@@ -25,8 +25,10 @@ export default {
   methods: {
     async addFile(e) {
       var files = e.target.files || e.dataTransfer.files;
+
       for (let i = 0; i < files.length; i++) {
-        this.$parent.addFile(await files[i].arrayBuffer());
+        if (files[i].type == 'application/pdf')
+          this.$parent.addFile(await files[i].arrayBuffer());
       }
       e.target.value = '';
     },
