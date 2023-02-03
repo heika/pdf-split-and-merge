@@ -17,6 +17,7 @@
 
 <script>
 import { PDFDocument } from 'pdf-lib';
+import * as PDFJS from 'pdfjs-dist';
 
 export default {
   name: 'Result',
@@ -72,6 +73,15 @@ export default {
           content: `${docUrl}#toolbar=0&navpanes=0&scrollbar=0`,
           size: newPdfDoc[i].size,
         });
+        
+        PDFJS.GlobalWorkerOptions.workerSrc = '//cdn.jsdelivr.net/npm/pdfjs-dist@3.3.122/build/pdf.worker.js';
+        PDFJS.disableWorker = true;
+        
+        const loadingTask = await PDFJS.getDocument(docUrl);
+        
+        loadingTask.promise.then(function(pdf) {
+          console.log(pdf);
+        })
       }
 
       return docUrls;
