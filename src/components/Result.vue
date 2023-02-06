@@ -1,23 +1,28 @@
 <template>
-  <div id="uploaded-files" v-if="pages.length > 0">
-    <button v-if="pages.length > 0" v-on:click="merge">Merge</button>
-    <ul>
-      <li v-for="(page, index) in pages">
-        <input type="checkbox" v-model="page.selected" />
-        <iframe
-          :src="page.content"
-          :height="page.size.height/2"
-          :width="page.size.width/2"
-        >
-        <button v-on:click="deletePage(index)">Delete</button>
-      </li>
-    </ul>
+  <div>
+    <div id="uploaded-files" v-if="pages.length > 0">
+      <button v-if="pages.length > 0" v-on:click="merge">Merge</button>
+      <ul>
+        <li v-for="(page, index) in pages">
+          <input type="checkbox" v-model="page.selected" />
+          <!--
+          <iframe
+            :src="page.content"
+            :height="page.size.height/2"
+            :width="page.size.width/2"
+          >
+          -->
+          <canvas :id="`canvas_${index}`" :ref="`canvas_${index}`">
+          <button v-on:click="deletePage(index)">Delete</button>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
 import { PDFDocument } from 'pdf-lib';
-import * as PDFJS from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist';
 
 export default {
   name: 'Result',
@@ -25,16 +30,38 @@ export default {
   data() {
     return {
       pages: [],
+      scale: 1,
     };
   },
   watch: {
     file: {
       handler: async function (newValue, oldValue) {
-        if (newValue != null && newValue != '')
-          this.pages = [...this.pages, ...(await this.getSrc(newValue))];
+        if (newValue != null && newValue != '') {
+         let prevLength = this.pages.length;
+         let _this = this;
+
+          this.pages = [...this.pages, ...(await this.getSrc(newValue, this.pages.length))];
+
+          for(let i=prevLength; i<this.pages.length; i++) {
+            const loadingTask = await pdfjsLib
+              .getDocument(this.pages[i].content)
+              .promise.then(function (pdfDoc_) {
+                let pdfDoc = pdfDoc_;
+                //document.getElementById('page_count').textContent = pdfDoc.numPages;
+
+                // Initial/first page rendering
+                _this.renderPage(pdfDoc, 1, i);
+              });
+            }
+          }
       },
       deep: true,
     },
+  },
+  created() {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      '//cdn.jsdelivr.net/npm/pdfjs-dist@3.3.122/build/pdf.worker.js';
+    pdfjsLib.disableWorker = true;
   },
   methods: {
     async extractPdfPage(arrayBuff) {
@@ -60,9 +87,11 @@ export default {
 
       return pdfPages;
     },
-    async getSrc(file) {
+    async getSrc(file, prevLength) {
       const newPdfDoc = await this.extractPdfPage(file);
       let docUrls = [];
+      let _this = this;
+
       for (let i = 0; i < newPdfDoc.length; i++) {
         const tempblob = new Blob([newPdfDoc[i].pdf], {
           type: 'application/pdf',
@@ -70,18 +99,9 @@ export default {
         const docUrl = URL.createObjectURL(tempblob);
         docUrls.push({
           selected: true,
-          content: `${docUrl}#toolbar=0&navpanes=0&scrollbar=0`,
+          content: `${docUrl}`,
           size: newPdfDoc[i].size,
         });
-        
-        PDFJS.GlobalWorkerOptions.workerSrc = '//cdn.jsdelivr.net/npm/pdfjs-dist@3.3.122/build/pdf.worker.js';
-        PDFJS.disableWorker = true;
-        
-        const loadingTask = await PDFJS.getDocument(docUrl);
-        
-        loadingTask.promise.then(function(pdf) {
-          console.log(pdf);
-        })
       }
 
       return docUrls;
@@ -118,12 +138,47 @@ export default {
       link.click();
       window.URL.revokeObjectURL(link.href);
     },
+    renderPage(pdfDoc, num, index) {
+      let _this = this;
+
+      //pageRendering = true;
+      // Using promise to fetch the page
+      pdfDoc.getPage(num).then(function (page) {
+        var viewport = page.getViewport({ scale: _this.scale });
+        let canvas = _this.$refs['canvas_' + index];
+        if(Array.isArray(canvas))
+          canvas = canvas[0];
+        let ctx = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Render PDF page into canvas context
+        var renderContext = {
+          canvasContext: ctx,
+          viewport: viewport,
+        };
+        var renderTask = page.render(renderContext);
+
+        // Wait for rendering to finish
+        /*
+        renderTask.promise.then(function () {
+          //pageRendering = false;
+          if (pageNumPending !== null) {
+            // New page rendering is pending
+            _this.renderPage(pdfDoc, pageNumPending);
+            pageNumPending = null;
+          }
+        });
+        */
+      });
+    },
   },
 };
 </script>
 
 <style scoped>
-iframe {
-  width: 100%;
+canvas {
+  width: 90%;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 </style>
