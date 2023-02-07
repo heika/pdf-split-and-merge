@@ -2,10 +2,10 @@
   <div id="uploaded-files" v-if="pages.length > 0">
     <button v-if="pages.length > 0" v-on:click="merge">Merge</button>
     <ul>
-      <li v-for="(page, index) in pages">
+      <li v-for="(page, index) in pages" :ref="`page_${page.guid}`">
         <input type="checkbox" v-model="page.selected" />
-        <canvas :id="`canvas_${index}`" :ref="`canvas_${index}`" />
-        <button v-on:click="deletePage(index)">Delete</button>
+        <canvas :id="`canvas_${page.guid}`" :ref="`canvas_${page.guid}`" />
+        <button v-on:click="deletePage(page.guid)">Delete</button>
       </li>
     </ul>
   </div>
@@ -44,7 +44,7 @@ export default {
                 //document.getElementById('page_count').textContent = pdfDoc.numPages;
 
                 // Initial/first page rendering
-                _this.renderPage(pdfDoc, 1, i);
+                _this.renderPage(pdfDoc, 1, _this.pages[i].guid);
               });
           }
         }
@@ -67,15 +67,12 @@ export default {
       for (let i = 0; i < noOfPage; i++) {
         const pdfNewDoc = await PDFDocument.create();
         const docPages = await pdfNewDoc.copyPages(pdfSrcDoc, [i]);
-        let size = {};
         docPages.forEach(function (page) {
           pdfNewDoc.addPage(page);
-          size = page.getSize();
         });
         const newpdf = await pdfNewDoc.save();
         pdfPages.push({
           pdf: newpdf,
-          size: size,
         });
       }
 
@@ -94,7 +91,7 @@ export default {
         docUrls.push({
           selected: true,
           content: `${docUrl}`,
-          size: newPdfDoc[i].size,
+          guid: this.$parent.uuidv4(),
         });
       }
 
@@ -132,14 +129,15 @@ export default {
       link.click();
       window.URL.revokeObjectURL(link.href);
     },
-    renderPage(pdfDoc, num, index) {
+    renderPage(pdfDoc, num, guid) {
       let _this = this;
 
       //pageRendering = true;
       // Using promise to fetch the page
+      console.log(pdfDoc);
       pdfDoc.getPage(num).then(function (page) {
         var viewport = page.getViewport({ scale: _this.scale });
-        let canvas = _this.$refs['canvas_' + index];
+        let canvas = _this.$refs['canvas_' + guid];
         if (Array.isArray(canvas)) canvas = canvas[0];
         let ctx = canvas.getContext('2d');
         canvas.height = viewport.height;
