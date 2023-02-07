@@ -53,9 +53,7 @@ export default {
               .getDocument(this.pages[i].content)
               .promise.then(async function (pdfDoc_) {
                 let pdfDoc = pdfDoc_;
-                //document.getElementById('page_count').textContent = pdfDoc.numPages;
 
-                // Initial/first page rendering
                 await _this.renderPage(pdfDoc, 1, _this.pages[i]);
               });
           }
@@ -147,7 +145,6 @@ export default {
       if (Array.isArray(canvas)) canvas = canvas[0];
       let ctx = canvas.getContext('2d');
 
-      //pageRendering = true;
       // Using promise to fetch the page
       await pdfDoc.getPage(num).then(async function (page) {
         var viewport = page.getViewport({ scale: _this.scale });
@@ -163,17 +160,8 @@ export default {
         var renderTask = page.render(renderContext);
 
         // Wait for rendering to finish
-
         await renderTask.promise.then(function () {
           curPage.url = canvas.toDataURL();
-          //pageRendering = false;
-          /*
-          if (pageNumPending !== null) {
-            // New page rendering is pending
-            _this.renderPage(pdfDoc, pageNumPending);
-            pageNumPending = null;
-          }
-          */
         });
       });
     },
