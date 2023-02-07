@@ -40,12 +40,12 @@ export default {
           for (let i = prevLength; i < this.pages.length; i++) {
             const loadingTask = await pdfjsLib
               .getDocument(this.pages[i].content)
-              .promise.then(function (pdfDoc_) {
+              .promise.then(async function (pdfDoc_) {
                 let pdfDoc = pdfDoc_;
                 //document.getElementById('page_count').textContent = pdfDoc.numPages;
 
                 // Initial/first page rendering
-                _this.renderPage(pdfDoc, 1, _this.pages[i]);
+                await _this.renderPage(pdfDoc, 1, _this.pages[i]);
               });
           }
         }
@@ -130,7 +130,7 @@ export default {
       link.click();
       window.URL.revokeObjectURL(link.href);
     },
-    renderPage(pdfDoc, num, curPage) {
+    async renderPage(pdfDoc, num, curPage) {
       let _this = this;
       let canvas = _this.$refs['canvas'];
       if (Array.isArray(canvas)) canvas = canvas[0];
@@ -138,7 +138,7 @@ export default {
 
       //pageRendering = true;
       // Using promise to fetch the page
-      pdfDoc.getPage(num).then(function (page) {
+      await pdfDoc.getPage(num).then(async function (page) {
         var viewport = page.getViewport({ scale: _this.scale });
 
         canvas.height = viewport.height;
@@ -153,7 +153,7 @@ export default {
 
         // Wait for rendering to finish
 
-        renderTask.promise.then(function () {
+        await renderTask.promise.then(function () {
           curPage.url = canvas.toDataURL();
           //pageRendering = false;
           /*
