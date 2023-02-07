@@ -1,10 +1,11 @@
 <template>
   <div id="uploaded-files" v-if="pages.length > 0">
+    <canvas ref="canvas" />
     <button v-if="pages.length > 0" v-on:click="merge">Merge</button>
     <ul>
       <li v-for="(page, index) in pages" :ref="`page_${page.guid}`">
         <input type="checkbox" v-model="page.selected" />
-        <canvas :id="`canvas_${page.guid}`" :ref="`canvas_${page.guid}`" />
+        <img :src="page.url" />
         <button v-on:click="deletePage(page.guid)">Delete</button>
       </li>
     </ul>
@@ -44,7 +45,7 @@ export default {
                 //document.getElementById('page_count').textContent = pdfDoc.numPages;
 
                 // Initial/first page rendering
-                _this.renderPage(pdfDoc, 1, _this.pages[i].guid);
+                _this.renderPage(pdfDoc, 1, _this.pages[i]);
               });
           }
         }
@@ -97,8 +98,8 @@ export default {
 
       return docUrls;
     },
-    deletePage(index) {
-      this.pages.splice(index, 1);
+    deletePage(guid) {
+      this.pages = this.pages.filter((p) => p.guid != guid);
     },
     async merge() {
       const selectedPages = this.pages.filter((page) => {
@@ -129,17 +130,17 @@ export default {
       link.click();
       window.URL.revokeObjectURL(link.href);
     },
-    renderPage(pdfDoc, num, guid) {
+    renderPage(pdfDoc, num, curPage) {
       let _this = this;
+      let canvas = _this.$refs['canvas'];
+      if (Array.isArray(canvas)) canvas = canvas[0];
+      let ctx = canvas.getContext('2d');
 
       //pageRendering = true;
       // Using promise to fetch the page
-      console.log(pdfDoc);
       pdfDoc.getPage(num).then(function (page) {
         var viewport = page.getViewport({ scale: _this.scale });
-        let canvas = _this.$refs['canvas_' + guid];
-        if (Array.isArray(canvas)) canvas = canvas[0];
-        let ctx = canvas.getContext('2d');
+
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
@@ -151,16 +152,18 @@ export default {
         var renderTask = page.render(renderContext);
 
         // Wait for rendering to finish
-        /*
+
         renderTask.promise.then(function () {
+          curPage.url = canvas.toDataURL();
           //pageRendering = false;
+          /*
           if (pageNumPending !== null) {
             // New page rendering is pending
             _this.renderPage(pdfDoc, pageNumPending);
             pageNumPending = null;
           }
+          */
         });
-        */
       });
     },
   },
@@ -169,6 +172,9 @@ export default {
 
 <style scoped>
 canvas {
+  display: none;
+}
+img {
   width: 90%;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
