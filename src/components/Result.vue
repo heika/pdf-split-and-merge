@@ -4,9 +4,20 @@
     <button v-if="pages.length > 0" v-on:click="merge">Merge</button>
     <ul>
       <li v-for="(page, index) in pages" :ref="`page_${page.guid}`">
-        <input type="checkbox" v-model="page.selected" />
-        <img :src="page.url" />
-        <button v-on:click="deletePage(page.guid)">Delete</button>
+        <input
+          type="checkbox"
+          v-model="page.selected"
+          :id="`cb_${page.guid}`"
+        />
+        <label :for="`cb_${page.guid}`">
+          <img :src="page.url" />
+        </label>
+        <div class="button-set">
+          <button v-on:click="move(1, page.guid)">↑</button>
+          <button v-on:click="move(0, page.guid)">↓</button>
+          <button v-on:click="rotate(page.guid)">⭯</button>
+          <button v-on:click="deletePage(page.guid)">X</button>
+        </div>
       </li>
     </ul>
   </div>
@@ -177,5 +188,30 @@ canvas {
 img {
   width: 90%;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+input[type='checkbox'] {
+  width: 0;
+}
+label {
+  display: block;
+}
+input + label {
+  border-radius: 10px;
+  padding: 10px;
+}
+input:checked + label {
+  background-color: #f3f3f3;
+}
+ul,
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+li .button-set {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 </style>
