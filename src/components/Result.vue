@@ -165,6 +165,9 @@ export default {
         });
       });
     },
+    move(direction, guid) {
+      let index = this.pages.findIndex((p) => p.guid == guid);
+    },
   },
 };
 </script>
