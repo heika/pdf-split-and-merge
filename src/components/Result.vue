@@ -10,7 +10,10 @@
           :id="`cb_${page.guid}`"
         />
         <label :for="`cb_${page.guid}`">
-          <img :src="page.url" />
+          <img
+            :src="page.url"
+            :style="`transform: rotate(${page.rotation}deg);`"
+          />
         </label>
         <div class="button-set">
           <button v-on:click="move(-1, page.guid)" v-if="index > 0">↑</button>
