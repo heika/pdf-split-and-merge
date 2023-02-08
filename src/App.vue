@@ -6,8 +6,6 @@
 </template>
 
 <script>
-import { PDFDocument } from 'pdf-lib';
-
 import Panel from './components/Panel.vue';
 import Result from './components/Result.vue';
 

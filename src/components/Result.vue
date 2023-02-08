@@ -107,6 +107,7 @@ export default {
           selected: true,
           content: `${docUrl}`,
           guid: this.$parent.uuidv4(),
+          rotation: 0,
         });
       }
 
@@ -123,11 +124,16 @@ export default {
       const pdfNewDoc = await PDFDocument.create();
 
       for (let i = 0; i < selectedPages.length; i++) {
-        let url = selectedPages[i].content;
+        let page = selectedPages[i];
+        let url = page.content;
         let blob = await fetch(url).then((r) => r.blob());
         let arrayBuffer = await new Response(blob).arrayBuffer();
         const selectedPdf = await PDFDocument.load(arrayBuffer);
 
+        if (page.rotation > 0)
+          selectedPdf
+            .getPages()[0]
+            .setRotation({ type: 'degrees', angle: page.rotation });
         const [existingPage] = await pdfNewDoc.copyPages(selectedPdf, [0]);
         pdfNewDoc.addPage(existingPage);
       }
@@ -172,9 +178,13 @@ export default {
     },
     move(step, guid) {
       let fromIndex = this.pages.findIndex((p) => p.guid == guid);
-      var element = this.pages[fromIndex];
+      let element = this.pages[fromIndex];
       this.pages.splice(fromIndex, 1);
       this.pages.splice(fromIndex + step, 0, element);
+    },
+    rotate(guid) {
+      let page = this.pages.find((p) => p.guid == guid);
+      page.rotation = (page.rotation + 90) % 360;
     },
   },
 };
