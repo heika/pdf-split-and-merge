@@ -13,8 +13,13 @@
           <img :src="page.url" />
         </label>
         <div class="button-set">
-          <button v-on:click="move(1, page.guid)">↑</button>
-          <button v-on:click="move(0, page.guid)">↓</button>
+          <button v-on:click="move(-1, page.guid)" v-if="index > 0">↑</button>
+          <button
+            v-on:click="move(1, page.guid)"
+            v-if="index < pages.length - 1"
+          >
+            ↓
+          </button>
           <button v-on:click="rotate(page.guid)">⭯</button>
           <button v-on:click="deletePage(page.guid)">X</button>
         </div>
@@ -165,8 +170,11 @@ export default {
         });
       });
     },
-    move(direction, guid) {
-      let index = this.pages.findIndex((p) => p.guid == guid);
+    move(step, guid) {
+      let fromIndex = this.pages.findIndex((p) => p.guid == guid);
+      var element = this.pages[fromIndex];
+      this.pages.splice(fromIndex, 1);
+      this.pages.splice(fromIndex + step, 0, element);
     },
   },
 };
