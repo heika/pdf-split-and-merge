@@ -10,10 +10,14 @@
           :id="`cb_${page.guid}`"
         />
         <label :for="`cb_${page.guid}`">
-          <img
-            :src="page.url"
-            :style="`transform: rotate(${page.rotation}deg);`"
-          />
+          <div class="rotation-wrapper-outer">
+            <div class="rotation-wrapper-inner">
+              <img
+                :src="page.url"
+                :style="`transform: rotate(${page.rotation}deg);`"
+              />
+            </div>
+          </div>
         </label>
         <div class="button-set">
           <button v-on:click="move(-1, page.guid)" v-if="index > 0">↑</button>
@@ -198,7 +202,6 @@ canvas {
   display: none;
 }
 img {
-  width: 90%;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 input[type='checkbox'] {
@@ -225,5 +228,29 @@ li .button-set {
   position: absolute;
   right: 0;
   bottom: 0;
+}
+label div {
+  width: 100%;
+  overflow: hidden;
+}
+.button-set button {
+  border: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 5px 5px 0;
+  border-radius: 50%;
+  background: #ffe1e1;
+  cursor: pointer;
+}
+.button-set button:hover {
+  background: #ff7474;
+  color: #fff;
+}
+label div img {
+  width: 100%;
+  max-height: 100%;
 }
 </style>
