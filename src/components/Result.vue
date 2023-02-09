@@ -10,14 +10,11 @@
           :id="`cb_${page.guid}`"
         />
         <label :for="`cb_${page.guid}`">
-          <div class="rotation-wrapper-outer">
-            <div class="rotation-wrapper-inner">
-              <img
-                :src="page.url"
-                :style="`transform: rotate(${page.rotation}deg);`"
-              />
-            </div>
-          </div>
+          <img
+            :src="page.url"
+            :class="`rotate-${page.rotation}`"
+            :style="`transform: rotate(${page.rotation}deg);`"
+          />
         </label>
         <div class="button-set">
           <button v-on:click="move(-1, page.guid)" v-if="index > 0">↑</button>
@@ -213,6 +210,9 @@ label {
 input + label {
   border-radius: 10px;
   padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 input:checked + label {
   background-color: #f3f3f3;
@@ -249,8 +249,12 @@ label div {
   background: #ff7474;
   color: #fff;
 }
-label div img {
+label img {
   width: 100%;
-  max-height: 100%;
+}
+label img.rotate-90,
+label img.rotate-270 {
+  max-height: calc(100vw - 40px);
+  width: auto;
 }
 </style>
