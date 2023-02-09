@@ -37,14 +37,26 @@ export default {
 </script>
 
 <style>
+:root {
+  --main-result-width: 500px;
+}
 body {
   margin: 0;
   padding: 0;
   font-family: Verdana, Tahoma;
   position: relative;
 }
-
 div:has(> #uploaded-files) .upload-container {
   height: 100px;
+}
+button {
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin: 10px;
+}
+button.btn-primary {
+  background-color: #ff7474;
+  color: #fff;
 }
 </style>

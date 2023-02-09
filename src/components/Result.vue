@@ -1,7 +1,9 @@
 <template>
   <div id="uploaded-files" v-if="pages.length > 0">
     <canvas ref="canvas" />
-    <button v-if="pages.length > 0" v-on:click="merge">Merge</button>
+    <button class="btn-primary" v-if="pages.length > 0" v-on:click="merge">
+      Merge
+    </button>
     <ul>
       <li v-for="(page, index) in pages" :ref="`page_${page.guid}`">
         <input
@@ -195,6 +197,12 @@ export default {
 </script>
 
 <style scoped>
+div.uploaded-files {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 canvas {
   display: none;
 }
@@ -217,7 +225,11 @@ input + label {
 input:checked + label {
   background-color: #f3f3f3;
 }
-ul,
+ul {
+  margin: 20px;
+  padding: 0;
+  max-width: var(--main-result-width);
+}
 li {
   list-style: none;
   margin: 0;
@@ -254,7 +266,14 @@ label img {
 }
 label img.rotate-90,
 label img.rotate-270 {
+  /*
   max-height: calc(100vw - 40px);
   width: auto;
+  */
+}
+.btn-primary {
+  position: fixed;
+  right: 0;
+  z-index: 999;
 }
 </style>
