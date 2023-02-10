@@ -1,7 +1,11 @@
 <template>
   <div id="uploaded-files" v-if="pages.length > 0">
     <canvas ref="canvas" />
-    <button class="btn-primary" v-if="pages.length > 0" v-on:click="merge">
+    <button
+      class="btn-primary"
+      v-if="pages.find((p) => p.selected) != undefined"
+      v-on:click="merge"
+    >
       Merge
     </button>
     <ul>
@@ -221,20 +225,47 @@ input + label {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #f3f3f3;
+  box-sizing: border-box;
 }
 input:checked + label {
-  background-color: #f3f3f3;
+  border: 3px solid #ff7474;
 }
 ul {
   margin: 20px;
   padding: 0;
   max-width: var(--main-result-width);
+  counter-reset: item 0;
 }
 li {
   list-style: none;
   margin: 0;
   padding: 0;
   position: relative;
+}
+li::before {
+  width: 20px;
+  display: inline-block;
+}
+li:has(input:checked)::before {
+  content: counter(item) ' ';
+  counter-increment: item 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: #ff7474;
+  color: #fff;
+  position: absolute;
+  top: 3px;
+  left: -13px;
+  border-radius: 50%;
+  font-weight: bold;
+}
+li:not(:has(input:checked))::before {
+  content: ' ';
+  list-style: none;
 }
 li .button-set {
   position: absolute;
@@ -263,13 +294,6 @@ label div {
 }
 label img {
   width: 100%;
-}
-label img.rotate-90,
-label img.rotate-270 {
-  /*
-  max-height: calc(100vw - 40px);
-  width: auto;
-  */
 }
 .btn-primary {
   position: fixed;
