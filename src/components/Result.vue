@@ -11,12 +11,12 @@
           v-model="page.selected"
           :id="`cb_${page.guid}`"
         />
-        <label :for="`cb_${page.guid}`">
-          <img
-            :src="page.url"
-            :class="`rotate-${page.rotation}`"
-            :style="`transform: rotate(${page.rotation}deg);`"
-          />
+        <label :for="`cb_${page.guid}`" :class="`rotate-${page.rotation}`">
+          <div class="rotation-wrapper-outer">
+            <div class="rotation-wrapper-inner">
+              <img :src="page.url" :class="`rotate-${page.rotation}`" />
+            </div>
+          </div>
         </label>
         <div class="button-set">
           <button v-on:click="move(-1, page.guid)" v-if="index > 0">↑</button>
@@ -275,5 +275,28 @@ label img.rotate-270 {
   position: fixed;
   right: 0;
   z-index: 999;
+}
+
+.rotate-90 .rotation-wrapper-outer,
+.rotate-270 .rotation-wrapper-outer {
+  display: table;
+}
+.rotate-90 .rotation-wrapper-inner,
+.rotate-270 .rotation-wrapper-inner {
+  padding: 50% 0;
+  height: 0;
+}
+.rotate-90 img {
+  transform-origin: top left;
+  transform: rotate(-90deg) translate(-100%);
+  margin-top: -50%;
+}
+.rotate-180 img {
+  transform: rotate(180deg);
+}
+.rotate-270 img {
+  transform-origin: top left;
+  transform: rotate(90deg) translate(0, -100%);
+  margin-top: -50%;
 }
 </style>
