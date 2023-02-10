@@ -197,7 +197,7 @@ export default {
 </script>
 
 <style scoped>
-div.uploaded-files {
+div#uploaded-files {
   display: flex;
   flex-direction: column;
   justify-content: center;
